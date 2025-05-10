@@ -4,5 +4,6 @@
 void kmain();
 void clrScr();
 void print(const char *str);
+void printHex(unsigned int num);
 
 #endif 

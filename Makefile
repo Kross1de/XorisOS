@@ -1,9 +1,11 @@
-CC = gcc
-AS = nasm
-LD = ld
+CC 	= gcc
+AS 	= nasm
+LD 	= ld
+QEMU	= qemu-system-i386
 
 CFLAGS = -m32 -ffreestanding -nostdlib -nostartfiles -fno-stack-protector -nodefaultlibs -Wall -Wextra -Iinclude
 LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
+QEMUFLAGS = -cdrom
 
 SRC_DIR = src
 BUILD_DIR = build
@@ -28,6 +30,9 @@ create_iso: $(BUILD_DIR)/kernel.bin
 	cp $< $(ISO_DIR)/boot/
 	cp grub/grub.cfg $(ISO_DIR)/boot/grub/
 	grub-mkrescue -o xorisos.iso $(ISO_DIR)
+
+run:
+	$(QEMU) $(QEMUFLAGS) xorisos.iso
 
 clean:
 	rm -rf $(BUILD_DIR)/* $(ISO_DIR)/* xorisos.iso

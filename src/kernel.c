@@ -3,13 +3,16 @@
 #include "serial.h"
 void kmain() {
        clrScr();
+       InitIdt();
+       extern struct idt_ptr idtp;
+       print("IDT Base Addr: ");
+       printHex(idtp.base);
+       print("\n\n");
+       init_serial();
        print("                       ===========================\n");
        print("                       ==   Welcome to XorisOS  ==\n");
        print("                       ==   (c) kross1de  2025  ==\n");
        print("                       ===========================\n");
-
-       InitIdt();
-       init_serial();
        
        while (1) {}
 }
@@ -43,3 +46,16 @@ void print(const char *str) {
               i++;
        }
 } 
+
+void printHex(unsigned int num)
+{
+       char hex[11];
+       hex[0] = '0';
+       hex[1] = 'x';
+       for(int i = 7; i >= 0; i--){
+              int digit = (num >> (i*4)) & 0xf;
+              hex[2+(7-i)] = (digit < 10 ? '0' + digit : 'A' + digit - 10);
+       }
+       hex[10] = '\0';
+       print(hex);
+}
