@@ -2,7 +2,7 @@ CC = gcc
 AS = nasm
 LD = ld
 
-CFLAGS = -ffreestanding -nostdlib -nostartfiles -fno-stack-protector -nodefaultlibs -Wall -Wextra -Iinclude
+CFLAGS = -m32 -ffreestanding -nostdlib -nostartfiles -fno-stack-protector -nodefaultlibs -Wall -Wextra -Iinclude
 LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
 
 SRC_DIR = src
