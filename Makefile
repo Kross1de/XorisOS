@@ -2,7 +2,7 @@ CC = gcc
 AS = nasm
 LD = ld
 
-CFLAGS = -m32 -ffreestanding -nostdlib -nostartfiles -nodefaultlibs -Wall -Wextra -Iinclude
+CFLAGS = -ffreestanding -nostdlib -nostartfiles -fno-stack-protector -nodefaultlibs -Wall -Wextra -Iinclude
 LDFLAGS = -m elf_i386 -T linker.ld -nostdlib
 
 SRC_DIR = src
@@ -14,16 +14,22 @@ all: $(BUILD_DIR)/kernel.bin create_iso
 $(BUILD_DIR)/boot.o: $(SRC_DIR)/boot.asm
 	$(AS) -f elf32 $< -o $@
 
+$(BUILD_DIR)/isr_common.o: $(SRC_DIR)/isr_common.asm
+	$(AS) -f elf32 $< -o $@
+
 $(BUILD_DIR)/kernel.o: $(SRC_DIR)/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/idt.o: $(SRC_DIR)/idt.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/isr.o: $(SRC_DIR)/isr.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/serial.o: $(SRC_DIR)/serial.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/boot.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/idt.o $(BUILD_DIR)/serial.o
+$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/boot.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/idt.o $(BUILD_DIR)/isr.o $(BUILD_DIR)/serial.o $(BUILD_DIR)/isr_common.o
 	$(LD) $(LDFLAGS) $^ -o $@
 
 create_iso: $(BUILD_DIR)/kernel.bin
