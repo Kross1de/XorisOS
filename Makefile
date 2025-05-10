@@ -9,27 +9,18 @@ SRC_DIR = src
 BUILD_DIR = build
 ISO_DIR = iso
 
+OBJS = $(patsubst $(SRC_DIR)/%.asm, $(BUILD_DIR)/%.o, $(wildcard $(SRC_DIR)/*.asm)) \
+       $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(wildcard $(SRC_DIR)/*.c))
+
 all: $(BUILD_DIR)/kernel.bin create_iso
 
-$(BUILD_DIR)/boot.o: $(SRC_DIR)/boot.asm
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.asm
 	$(AS) -f elf32 $< -o $@
 
-$(BUILD_DIR)/isr_common.o: $(SRC_DIR)/isr_common.asm
-	$(AS) -f elf32 $< -o $@
-
-$(BUILD_DIR)/kernel.o: $(SRC_DIR)/kernel.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/idt.o: $(SRC_DIR)/idt.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/isr.o: $(SRC_DIR)/isr.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/serial.o: $(SRC_DIR)/serial.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/boot.o $(BUILD_DIR)/kernel.o $(BUILD_DIR)/idt.o $(BUILD_DIR)/isr.o $(BUILD_DIR)/serial.o $(BUILD_DIR)/isr_common.o
+$(BUILD_DIR)/kernel.bin: $(OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 create_iso: $(BUILD_DIR)/kernel.bin
